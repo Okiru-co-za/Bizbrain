@@ -5,8 +5,14 @@ import { NextResponse } from 'next/server'
 export default withAuth(
   function middleware(req) {
     const { pathname } = req.nextUrl
-    // Allow public files
-    if (pathname.startsWith('/_next') || pathname.startsWith('/api/auth')) return NextResponse.next()
+    // Allow public files and auth routes
+    if (
+      pathname.startsWith('/_next') ||
+      pathname.startsWith('/api/auth') ||
+      pathname.startsWith('/auth')
+    ) {
+      return NextResponse.next()
+    }
 
     // Attach tenant id to request headers for server-side scoping
     const token = (req as any).nextauth?.token as any
@@ -26,4 +32,4 @@ export default withAuth(
   }
 )
 
-export const config = { matcher: '/((?!api/auth|_next|static).*)' }
+export const config = { matcher: '/((?!api/auth|auth|_next|static).*)' }
