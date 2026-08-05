@@ -42,14 +42,22 @@ const authOptions = {
     })
   ],
   callbacks: {
-    async session({ session, user }: { session: any; user: any }) {
-      // Attach tenantId and role from DB user record
-      const dbUser = await prisma.user.findUnique({ where: { id: user.id } })
-      if (dbUser) {
-        session.user.id = dbUser.id
-        session.user.tenantId = dbUser.tenantId
-        session.user.role = dbUser.role
+    async jwt({ token, user }: { token: any; user?: any }) {
+      // `user` is only present on initial sign-in; look up tenantId/role once and persist them on the token
+      if (user) {
+        const dbUser = await prisma.user.findUnique({ where: { id: user.id } })
+        if (dbUser) {
+          token.id = dbUser.id
+          token.tenantId = dbUser.tenantId
+          token.role = dbUser.role
+        }
       }
+      return token
+    },
+    async session({ session, token }: { session: any; token: any }) {
+      session.user.id = token.id
+      session.user.tenantId = token.tenantId
+      session.user.role = token.role
       return session
     }
   },

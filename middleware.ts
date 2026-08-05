@@ -16,11 +16,11 @@ export default withAuth(
 
     // Attach tenant id to request headers for server-side scoping
     const token = (req as any).nextauth?.token as any
-    const res = NextResponse.next()
-    if (token && token.user && token.user.tenantId) {
-      res.headers.set('x-tenant-id', token.user.tenantId)
+    const requestHeaders = new Headers(req.headers)
+    if (token?.tenantId) {
+      requestHeaders.set('x-tenant-id', token.tenantId)
     }
-    return res
+    return NextResponse.next({ request: { headers: requestHeaders } })
   },
   {
     callbacks: {
