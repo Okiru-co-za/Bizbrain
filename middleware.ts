@@ -9,7 +9,10 @@ export default withAuth(
     if (
       pathname.startsWith('/_next') ||
       pathname.startsWith('/api/auth') ||
-      pathname.startsWith('/auth')
+      pathname.startsWith('/auth') ||
+      pathname === '/' ||
+      pathname === '/robots.txt' ||
+      pathname === '/sitemap.xml'
     ) {
       return NextResponse.next()
     }
@@ -24,9 +27,10 @@ export default withAuth(
   },
   {
     callbacks: {
-      authorized: ({ token }) => {
-        // Require an authenticated session for non-public routes
-        return !!token
+      authorized: ({ token, req }) => {
+        const pathname = req.nextUrl.pathname
+        const isPublic = pathname === '/' || pathname === '/robots.txt' || pathname === '/sitemap.xml'
+        return isPublic || !!token
       }
     }
   }

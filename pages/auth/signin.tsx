@@ -18,7 +18,7 @@ export default function SignIn({ csrfToken }: { csrfToken: string }) {
         email,
         csrfToken,
         redirect: false,
-        callbackUrl: '/'
+        callbackUrl: '/dashboard'
       })
 
       if (result?.error) {
@@ -32,7 +32,7 @@ export default function SignIn({ csrfToken }: { csrfToken: string }) {
       }
 
       if (result?.ok) {
-        window.location.href = '/'
+        window.location.href = '/dashboard'
       }
     } finally {
       setIsSubmitting(false)

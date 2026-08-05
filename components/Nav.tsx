@@ -7,7 +7,7 @@ const groups: Array<{ label: string; items: Array<{ href: string; label: string;
   {
     label: 'Workspace',
     items: [
-      { href: '/', label: 'Dashboard', icon: 'home' },
+      { href: '/dashboard', label: 'Dashboard', icon: 'home' },
       { href: '/assistant', label: 'AI Assistant', icon: 'spark' },
       { href: '/customers', label: 'Customers', icon: 'people' }
     ]
@@ -56,12 +56,12 @@ function NavIcon({ name }: { name: IconName }) {
 export default function Nav() {
   const router = useRouter()
 
-  const isActive = (href: string) => href === '/' ? router.pathname === '/' : router.pathname.startsWith(href)
+  const isActive = (href: string) => router.pathname.startsWith(href)
 
   return (
     <>
       <aside className="app-sidebar">
-        <Link href="/" className="app-brand" aria-label="BizBrain overview">
+        <Link href="/dashboard" className="app-brand" aria-label="BizBrain dashboard">
           <span className="app-brand-mark" aria-hidden="true"><i /><i /><i /></span>
           <span>BizBrain</span>
         </Link>
@@ -100,7 +100,7 @@ export default function Nav() {
       </aside>
 
       <header className="mobile-app-header">
-        <Link href="/" className="app-brand"><span className="app-brand-mark" aria-hidden="true"><i /><i /><i /></span><span>BizBrain</span></Link>
+        <Link href="/dashboard" className="app-brand"><span className="app-brand-mark" aria-hidden="true"><i /><i /><i /></span><span>BizBrain</span></Link>
         <Link href="/settings" className="mobile-settings" aria-label="Settings"><NavIcon name="settings" /></Link>
       </header>
       <nav className="mobile-tabs" aria-label="Mobile navigation">
