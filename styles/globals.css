@@ -18,8 +18,8 @@ body {
 .signin-shell {
   --ink: #17382d;
   --forest: #1f4a3b;
-  --pink: #f2a9b8;
-  --blush: #f8dce2;
+  --pink: #ff8de1;
+  --blush: #ffd9f6;
   --cream: #fbf7ef;
   min-height: 100vh;
   display: grid;
@@ -37,7 +37,7 @@ body {
   flex-direction: column;
   padding: clamp(1.5rem, 3.5vw, 3.5rem) clamp(1.5rem, 5.5vw, 5.5rem) 2rem;
   background:
-    radial-gradient(circle at 4% 92%, rgba(242, 169, 184, .17) 0 9rem, transparent 9.1rem),
+    radial-gradient(circle at 4% 92%, rgba(255, 141, 225, .16) 0 9rem, transparent 9.1rem),
     var(--cream);
 }
 
@@ -103,7 +103,7 @@ body {
   height: .5rem;
   border-radius: 50%;
   background: var(--pink);
-  box-shadow: 0 0 0 4px rgba(242, 169, 184, .2);
+  box-shadow: 0 0 0 4px rgba(255, 141, 225, .2);
 }
 
 .signin-content h1 {
@@ -189,7 +189,7 @@ body {
 }
 
 .signin-form button:focus-visible {
-  outline: 3px solid rgba(242, 169, 184, .65);
+  outline: 3px solid rgba(255, 141, 225, .65);
   outline-offset: 3px;
 }
 
