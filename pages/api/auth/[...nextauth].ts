@@ -15,6 +15,9 @@ const authOptions = {
         email: { label: 'Email', type: 'text' }
       },
       async authorize(credentials) {
+        if (process.env.NODE_ENV === 'production') {
+          throw new Error('Passwordless email sign-in is disabled in production')
+        }
         if (!credentials?.email) return null
         const email = credentials.email.toLowerCase()
         // Find or create a user tied to the seeded BizBrain tenant
