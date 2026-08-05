@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-type IconName = 'home' | 'spark' | 'people' | 'lead' | 'deal' | 'quote' | 'task' | 'inbox' | 'file' | 'chart' | 'invoice' | 'check' | 'hr' | 'leave' | 'clock' | 'settings'
+type IconName = 'home' | 'spark' | 'people' | 'lead' | 'deal' | 'quote' | 'task' | 'inbox' | 'file' | 'chart' | 'invoice' | 'check' | 'hr' | 'leave' | 'clock' | 'sync' | 'settings'
 
 const groups: Array<{ label: string; items: Array<{ href: string; label: string; icon: IconName }> }> = [
   {
@@ -36,7 +36,8 @@ const groups: Array<{ label: string; items: Array<{ href: string; label: string;
       { href: '/documents', label: 'Documents', icon: 'file' },
       { href: '/reports', label: 'Reports', icon: 'chart' },
       { href: '/invoices', label: 'Invoices', icon: 'invoice' },
-      { href: '/approvals', label: 'Approvals', icon: 'check' }
+      { href: '/approvals', label: 'Approvals', icon: 'check' },
+      { href: '/subscriptions', label: 'Subscriptions', icon: 'sync' }
     ]
   }
 ]
@@ -61,6 +62,7 @@ function NavIcon({ name }: { name: IconName }) {
       {name === 'hr' && <><path d="M8 20v-2a4 4 0 0 1 4-4h0a4 4 0 0 1 4 4v2" {...common} /><circle cx="12" cy="8" r="3.2" {...common} /></>}
       {name === 'leave' && <><path d="M5 4h14v16H5z" {...common} /><path d="M9 2v4M15 2v4M5 9h14" {...common} /></>}
       {name === 'clock' && <><circle cx="12" cy="12" r="9" {...common} /><path d="M12 7v5l3.5 2" {...common} /></>}
+      {name === 'sync' && <><path d="M4 12a8 8 0 0 1 13.66-5.66L20 8" {...common} /><path d="M20 4v4h-4" {...common} /><path d="M20 12a8 8 0 0 1-13.66 5.66L4 16" {...common} /><path d="M4 20v-4h4" {...common} /></>}
       {name === 'settings' && <><circle cx="12" cy="12" r="3" {...common} /><path d="M19 13.5v-3l-2-.7-.7-1.7.9-1.9-2.1-2.1-1.9.9-1.7-.7L10.5 2h-3l-.7 2.3-1.7.7-1.9-.9-2.1 2.1.9 1.9-.7 1.7-2 .7v3l2 .7.7 1.7-.9 1.9 2.1 2.1 1.9-.9 1.7.7.7 2.3h3l.7-2.3 1.7-.7 1.9.9 2.1-2.1-.9-1.9.7-1.7Z" transform="translate(2.5) scale(.8)" {...common} /></>}
     </svg>
   )

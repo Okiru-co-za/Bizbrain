@@ -61,6 +61,19 @@ enum InvoiceStatus {
   CANCELLED
 }
 
+enum BillingCycle {
+  WEEKLY
+  MONTHLY
+  ANNUAL
+  ONCE_OFF
+}
+
+enum VendorSubscriptionStatus {
+  ACTIVE
+  TRIAL
+  CANCELLED
+}
+
 enum LeaveType {
   ANNUAL
   SICK
@@ -122,6 +135,24 @@ model Subscription {
   status        String
   startedAt     DateTime @default(now())
   currentPeriodEnd DateTime?
+}
+
+// External vendor subscriptions the business itself pays for (cloud, AI/LLM
+// APIs, hosting, domains, software, etc.) - distinct from the Subscription
+// model above, which is the tenant's own BizBrain billing plan.
+model VendorSubscription {
+  id            String   @id @default(uuid())
+  tenantId      String
+  name          String
+  category      String?
+  costCents     Int
+  currency      String   @default("ZAR")
+  billingCycle  BillingCycle @default(MONTHLY)
+  status        VendorSubscriptionStatus @default(ACTIVE)
+  nextRenewalAt DateTime?
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model AuditLog {

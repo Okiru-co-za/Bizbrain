@@ -1,0 +1,213 @@
+import Layout from '../../components/Layout'
+import { useEffect, useMemo, useState } from 'react'
+
+type VendorSubscription = {
+  id: string
+  name: string
+  category?: string
+  costCents: number
+  billingCycle: string
+  status: string
+  nextRenewalAt?: string
+  notes?: string
+}
+
+const CYCLE_LABELS: Record<string, string> = {
+  WEEKLY: 'weekly',
+  MONTHLY: 'monthly',
+  ANNUAL: 'annual',
+  ONCE_OFF: 'once-off'
+}
+
+const STATUS_STYLES: Record<string, string> = {
+  ACTIVE: 'bg-green-100 text-green-700',
+  TRIAL: 'bg-amber-100 text-amber-700',
+  CANCELLED: 'bg-gray-200 text-gray-600'
+}
+
+const SUGGESTED_CATEGORIES = ['Cloud Hosting', 'AI / LLM', 'Web Hosting', 'Domain', 'Software', 'Other']
+
+function monthlyEquivalentCents(sub: VendorSubscription) {
+  switch (sub.billingCycle) {
+    case 'WEEKLY':
+      return sub.costCents * 4.345
+    case 'ANNUAL':
+      return sub.costCents / 12
+    case 'ONCE_OFF':
+      return 0
+    default:
+      return sub.costCents
+  }
+}
+
+function isRenewingSoon(sub: VendorSubscription) {
+  if (!sub.nextRenewalAt || sub.status === 'CANCELLED') return false
+  const daysUntil = (new Date(sub.nextRenewalAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+  return daysUntil >= 0 && daysUntil <= 14
+}
+
+export default function SubscriptionsPage() {
+  const [subscriptions, setSubscriptions] = useState<VendorSubscription[]>([])
+  const [loading, setLoading] = useState(true)
+
+  const [name, setName] = useState('')
+  const [category, setCategory] = useState('')
+  const [cost, setCost] = useState('')
+  const [billingCycle, setBillingCycle] = useState('MONTHLY')
+  const [nextRenewalAt, setNextRenewalAt] = useState('')
+  const [notes, setNotes] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
+
+  function load() {
+    return fetch('/api/vendor-subscriptions')
+      .then((r) => r.json())
+      .then((d) => setSubscriptions(d.vendorSubscriptions || []))
+  }
+
+  useEffect(() => {
+    load().finally(() => setLoading(false))
+  }, [])
+
+  const monthlySpendCents = useMemo(
+    () =>
+      subscriptions
+        .filter((s) => s.status !== 'CANCELLED')
+        .reduce((sum, s) => sum + monthlyEquivalentCents(s), 0),
+    [subscriptions]
+  )
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setError(null)
+    if (!name || !cost) {
+      setError('Name and cost are required')
+      return
+    }
+    setSubmitting(true)
+    try {
+      const res = await fetch('/api/vendor-subscriptions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          category: category || undefined,
+          costCents: Math.round(parseFloat(cost) * 100),
+          billingCycle,
+          nextRenewalAt: nextRenewalAt || undefined,
+          notes: notes || undefined
+        })
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        setError(data.error || 'Failed to add subscription')
+        return
+      }
+      setName('')
+      setCategory('')
+      setCost('')
+      setNextRenewalAt('')
+      setNotes('')
+      await load()
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  async function updateStatus(id: string, status: string) {
+    await fetch(`/api/vendor-subscriptions/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status })
+    })
+    await load()
+  }
+
+  return (
+    <Layout>
+      <h1 className="text-2xl font-semibold mb-4">Subscriptions</h1>
+
+      <div className="bg-white p-4 rounded shadow-sm mb-6">
+        <h3 className="font-medium mb-1">Estimated monthly spend</h3>
+        <div className="text-2xl font-semibold">R{(monthlySpendCents / 100).toLocaleString('en-ZA', { maximumFractionDigits: 0 })}</div>
+        <div className="text-sm text-gray-600">Across all active and trial subscriptions, normalized to a monthly amount.</div>
+      </div>
+
+      <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow-sm mb-6">
+        <h2 className="font-medium mb-3">New subscription</h2>
+        {error && <p className="text-sm text-red-600 mb-3">{error}</p>}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+          <input placeholder="Name (e.g. Microsoft Azure)" value={name} onChange={(e) => setName(e.target.value)} className="p-2 border rounded" />
+          <input
+            list="subscription-categories"
+            placeholder="Category (e.g. Cloud Hosting)"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="p-2 border rounded"
+          />
+          <datalist id="subscription-categories">
+            {SUGGESTED_CATEGORIES.map((c) => (
+              <option key={c} value={c} />
+            ))}
+          </datalist>
+          <input
+            type="number"
+            step="0.01"
+            placeholder="Cost (R)"
+            value={cost}
+            onChange={(e) => setCost(e.target.value)}
+            className="p-2 border rounded"
+          />
+          <select value={billingCycle} onChange={(e) => setBillingCycle(e.target.value)} className="p-2 border rounded">
+            <option value="WEEKLY">Weekly</option>
+            <option value="MONTHLY">Monthly</option>
+            <option value="ANNUAL">Annual</option>
+            <option value="ONCE_OFF">Once-off</option>
+          </select>
+          <input
+            type="date"
+            value={nextRenewalAt}
+            onChange={(e) => setNextRenewalAt(e.target.value)}
+            className="p-2 border rounded"
+          />
+        </div>
+        <input placeholder="Notes (optional)" value={notes} onChange={(e) => setNotes(e.target.value)} className="w-full p-2 border rounded mb-3" />
+        <button disabled={submitting} className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50">
+          {submitting ? 'Adding…' : 'Add subscription'}
+        </button>
+      </form>
+
+      <div className="grid gap-3">
+        {subscriptions.map((sub) => (
+          <div key={sub.id} className="bg-white p-3 rounded shadow-sm flex justify-between items-center">
+            <div>
+              <div className="font-medium">
+                {sub.name}
+                {sub.category && <span className="text-sm text-gray-500"> • {sub.category}</span>}
+              </div>
+              <div className="text-sm text-gray-600">
+                R{(sub.costCents / 100).toLocaleString('en-ZA')} / {CYCLE_LABELS[sub.billingCycle] || sub.billingCycle}
+                {sub.nextRenewalAt && ` • renews ${new Date(sub.nextRenewalAt).toLocaleDateString('en-ZA')}`}
+                {sub.notes && ` • ${sub.notes}`}
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              {isRenewingSoon(sub) && (
+                <span className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-700">Renewing soon</span>
+              )}
+              <span className={`text-xs px-2 py-1 rounded-full ${STATUS_STYLES[sub.status] || 'bg-gray-100 text-gray-600'}`}>
+                {sub.status.toLowerCase()}
+              </span>
+              {sub.status !== 'CANCELLED' && (
+                <button onClick={() => updateStatus(sub.id, 'CANCELLED')} className="text-sm text-gray-500">
+                  Cancel
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+        {!loading && subscriptions.length === 0 && <div className="text-sm text-gray-600">No subscriptions tracked yet.</div>}
+      </div>
+    </Layout>
+  )
+}
