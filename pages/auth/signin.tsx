@@ -114,7 +114,7 @@ export default function SignIn({ csrfToken }: { csrfToken: string }) {
         <section className="signin-visual" aria-label="A business owner managing her day">
           <Image
             src="/auth/bizbrain-login-hero.png"
-            alt="A confident business owner working at her laptop while speaking on a pink telephone"
+            alt="A composed business owner calmly directing several work demands while speaking on a pink telephone"
             fill
             priority
             sizes="(max-width: 767px) 100vw, 56vw"
