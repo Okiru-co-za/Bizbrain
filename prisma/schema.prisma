@@ -61,6 +61,19 @@ enum InvoiceStatus {
   CANCELLED
 }
 
+enum LeaveType {
+  ANNUAL
+  SICK
+  UNPAID
+  OTHER
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 // Core
 model Tenant {
   id        String   @id @default(uuid())
@@ -82,6 +95,7 @@ model User {
   phone      String?
   role       RoleName @default(STAFF)
   isActive   Boolean  @default(true)
+  startDate  DateTime?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   // Relations (inverse fields)
@@ -92,6 +106,8 @@ model User {
   tasksAssigned     Task[]
   approvalsRequested Approval[]
   invoicesCreated   Invoice[]
+  leaveRequests     LeaveRequest[]
+  timeEntries       TimeEntry[]
   accounts          Account[]
   sessions          Session[]
 }
@@ -275,6 +291,32 @@ model InvoiceItem {
   unitPriceCents Int
 }
 
+model LeaveRequest {
+  id        String      @id @default(uuid())
+  tenantId  String
+  userId    String
+  user      User        @relation(fields: [userId], references: [id])
+  type      LeaveType   @default(ANNUAL)
+  startDate DateTime
+  endDate   DateTime
+  reason    String?
+  status    LeaveStatus @default(PENDING)
+  createdAt DateTime    @default(now())
+}
+
+model TimeEntry {
+  id          String   @id @default(uuid())
+  tenantId    String
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  date        DateTime
+  hoursWorked Float
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  @@unique([userId, date])
+}
+
 // Tasks, Approvals, Inbox
 model Task {
   id          String   @id @default(uuid())
@@ -286,9 +328,10 @@ model Task {
   assignedToId String?
   assignedTo  User?    @relation(fields: [assignedToId], references: [id])
   dueDate     DateTime?
-  priority    Int?     
+  priority    Int?
   status      TaskStatus @default(NOT_STARTED)
   recurrence  String?
+  category    String?
   createdById String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

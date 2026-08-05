@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-type IconName = 'home' | 'spark' | 'people' | 'lead' | 'deal' | 'quote' | 'task' | 'inbox' | 'file' | 'chart' | 'invoice' | 'check' | 'settings'
+type IconName = 'home' | 'spark' | 'people' | 'lead' | 'deal' | 'quote' | 'task' | 'inbox' | 'file' | 'chart' | 'invoice' | 'check' | 'hr' | 'leave' | 'clock' | 'settings'
 
 const groups: Array<{ label: string; items: Array<{ href: string; label: string; icon: IconName }> }> = [
   {
@@ -19,6 +19,14 @@ const groups: Array<{ label: string; items: Array<{ href: string; label: string;
       { href: '/opportunities', label: 'Opportunities', icon: 'deal' },
       { href: '/quotes', label: 'Quotes', icon: 'quote' },
       { href: '/tasks', label: 'Tasks', icon: 'task' }
+    ]
+  },
+  {
+    label: 'Team',
+    items: [
+      { href: '/hr', label: 'HR Overview', icon: 'hr' },
+      { href: '/leave', label: 'Leave', icon: 'leave' },
+      { href: '/time-entries', label: 'Time Entries', icon: 'clock' }
     ]
   },
   {
@@ -50,6 +58,9 @@ function NavIcon({ name }: { name: IconName }) {
       {name === 'chart' && <><path d="M4 20V4M4 20h16" {...common} /><path d="m7 16 4-5 3 2 5-7" {...common} /></>}
       {name === 'invoice' && <><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z" {...common} /><path d="M9 8h6M9 12h6M9 16h3" {...common} /></>}
       {name === 'check' && <><circle cx="12" cy="12" r="9" {...common} /><path d="m8 12.5 2.5 2.5L16 9.5" {...common} /></>}
+      {name === 'hr' && <><path d="M8 20v-2a4 4 0 0 1 4-4h0a4 4 0 0 1 4 4v2" {...common} /><circle cx="12" cy="8" r="3.2" {...common} /></>}
+      {name === 'leave' && <><path d="M5 4h14v16H5z" {...common} /><path d="M9 2v4M15 2v4M5 9h14" {...common} /></>}
+      {name === 'clock' && <><circle cx="12" cy="12" r="9" {...common} /><path d="M12 7v5l3.5 2" {...common} /></>}
       {name === 'settings' && <><circle cx="12" cy="12" r="3" {...common} /><path d="M19 13.5v-3l-2-.7-.7-1.7.9-1.9-2.1-2.1-1.9.9-1.7-.7L10.5 2h-3l-.7 2.3-1.7.7-1.9-.9-2.1 2.1.9 1.9-.7 1.7-2 .7v3l2 .7.7 1.7-.9 1.9 2.1 2.1 1.9-.9 1.7.7.7 2.3h3l.7-2.3 1.7-.7 1.9.9 2.1-2.1-.9-1.9.7-1.7Z" transform="translate(2.5) scale(.8)" {...common} /></>}
     </svg>
   )
