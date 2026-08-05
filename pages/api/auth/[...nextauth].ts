@@ -15,11 +15,18 @@ const authOptions = {
         email: { label: 'Email', type: 'text' }
       },
       async authorize(credentials) {
-        if (process.env.NODE_ENV === 'production') {
-          throw new Error('Passwordless email sign-in is disabled in production')
-        }
         if (!credentials?.email) return null
         const email = credentials.email.toLowerCase()
+
+        if (process.env.NODE_ENV === 'production') {
+          const allowedEmails = (process.env.PASSWORDLESS_ALLOWED_EMAILS || '')
+            .split(',')
+            .map((e) => e.trim().toLowerCase())
+            .filter(Boolean)
+          if (!allowedEmails.includes(email)) {
+            throw new Error('Passwordless email sign-in is restricted in production')
+          }
+        }
         // Find or create a user tied to the seeded BizBrain tenant
         const tenant = await prisma.tenant.findFirst({ where: { name: 'BizBrain (SA) Ltd' } })
         if (!tenant) throw new Error('Seed tenant not found')
