@@ -20,11 +20,13 @@ body {
   --forest: #1f4a3b;
   --pink: #ff8de1;
   --blush: #ffd9f6;
-  --cream: #fbf7ef;
+  --surface: #f4f5f2;
+  --maroon: #6f243f;
+  --wood: #8a5b3d;
   min-height: 100vh;
   display: grid;
   grid-template-columns: minmax(390px, 44%) minmax(0, 56%);
-  background: var(--cream);
+  background: var(--surface);
   color: var(--ink);
   overflow: hidden;
 }
@@ -37,8 +39,8 @@ body {
   flex-direction: column;
   padding: clamp(1.5rem, 3.5vw, 3.5rem) clamp(1.5rem, 5.5vw, 5.5rem) 2rem;
   background:
-    radial-gradient(circle at 4% 92%, rgba(255, 141, 225, .16) 0 9rem, transparent 9.1rem),
-    var(--cream);
+    radial-gradient(circle at 4% 92%, rgba(255, 141, 225, .14) 0 9rem, transparent 9.1rem),
+    var(--surface);
 }
 
 .brand-lockup {
@@ -215,7 +217,7 @@ body {
 }
 
 .signin-footer {
-  color: #89958f;
+  color: var(--wood);
   font-size: .7rem;
   letter-spacing: .03em;
 }
@@ -316,7 +318,8 @@ body {
   gap: .8rem;
   border: 1px solid rgba(255,255,255,.5);
   border-radius: 1rem;
-  background: rgba(251, 247, 239, .89);
+  border-bottom-color: rgba(138, 91, 61, .75);
+  background: rgba(244, 245, 242, .92);
   padding: .8rem 1rem;
   color: var(--ink);
   box-shadow: 0 18px 50px rgba(17, 43, 34, .18);
@@ -330,7 +333,8 @@ body {
   flex: 0 0 auto;
   place-items: center;
   border-radius: 50%;
-  background: var(--pink);
+  background: var(--maroon);
+  color: white;
 }
 
 .status-icon svg { width: 1.2rem; }
