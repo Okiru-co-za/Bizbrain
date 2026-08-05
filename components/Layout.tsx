@@ -1,11 +1,17 @@
-import Nav from './Nav'
 import { ReactNode } from 'react'
+import Nav from './Nav'
 
 export default function Layout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="app-shell">
       <Nav />
-      <main className="container py-8">{children}</main>
+      <div className="app-frame">
+        <main className="app-main">
+          <div className="app-shape app-shape-pink" aria-hidden="true" />
+          <div className="app-shape app-shape-wood" aria-hidden="true" />
+          <div className="app-content">{children}</div>
+        </main>
+      </div>
     </div>
   )
 }
