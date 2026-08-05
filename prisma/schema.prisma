@@ -53,6 +53,14 @@ enum TaskStatus {
   CANCELLED
 }
 
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
 // Core
 model Tenant {
   id        String   @id @default(uuid())
@@ -83,6 +91,7 @@ model User {
   quotesCreated     Quote[]
   tasksAssigned     Task[]
   approvalsRequested Approval[]
+  invoicesCreated   Invoice[]
   accounts          Account[]
   sessions          Session[]
 }
@@ -134,6 +143,7 @@ model Customer {
   leads         Lead[]
   opportunities Opportunity[]
   quotes        Quote[]
+  invoices      Invoice[]
 }
 
 model Contact {
@@ -201,6 +211,7 @@ model Product {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   quoteItems  QuoteItem[]
+  invoiceItems InvoiceItem[]
 }
 
 model Quote {
@@ -217,6 +228,7 @@ model Quote {
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
   items        QuoteItem[]
+  invoices     Invoice[]
 }
 
 model QuoteItem {
@@ -227,6 +239,39 @@ model QuoteItem {
   product   Product? @relation(fields: [productId], references: [id])
   description String?
   quantity  Int     @default(1)
+  unitPriceCents Int
+}
+
+model Invoice {
+  id            String   @id @default(uuid())
+  tenantId      String
+  customerId    String?
+  customer      Customer? @relation(fields: [customerId], references: [id])
+  quoteId       String?
+  quote         Quote?   @relation(fields: [quoteId], references: [id])
+  invoiceNumber String
+  status        InvoiceStatus @default(DRAFT)
+  totalCents    Int
+  dueDate       DateTime?
+  issuedAt      DateTime?
+  paidAt        DateTime?
+  createdById   String?
+  createdBy     User?    @relation(fields: [createdById], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  items         InvoiceItem[]
+
+  @@unique([tenantId, invoiceNumber])
+}
+
+model InvoiceItem {
+  id             String   @id @default(uuid())
+  invoiceId      String
+  invoice        Invoice  @relation(fields: [invoiceId], references: [id])
+  productId      String?
+  product        Product? @relation(fields: [productId], references: [id])
+  description    String?
+  quantity       Int      @default(1)
   unitPriceCents Int
 }
 

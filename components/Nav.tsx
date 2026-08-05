@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-type IconName = 'home' | 'spark' | 'people' | 'lead' | 'deal' | 'quote' | 'task' | 'inbox' | 'file' | 'chart' | 'settings'
+type IconName = 'home' | 'spark' | 'people' | 'lead' | 'deal' | 'quote' | 'task' | 'inbox' | 'file' | 'chart' | 'invoice' | 'check' | 'settings'
 
 const groups: Array<{ label: string; items: Array<{ href: string; label: string; icon: IconName }> }> = [
   {
@@ -26,7 +26,9 @@ const groups: Array<{ label: string; items: Array<{ href: string; label: string;
     items: [
       { href: '/inbox', label: 'Inbox', icon: 'inbox' },
       { href: '/documents', label: 'Documents', icon: 'file' },
-      { href: '/reports', label: 'Reports', icon: 'chart' }
+      { href: '/reports', label: 'Reports', icon: 'chart' },
+      { href: '/invoices', label: 'Invoices', icon: 'invoice' },
+      { href: '/approvals', label: 'Approvals', icon: 'check' }
     ]
   }
 ]
@@ -46,6 +48,8 @@ function NavIcon({ name }: { name: IconName }) {
       {name === 'inbox' && <><path d="M4 5h16v14H4z" {...common} /><path d="m4 7 8 6 8-6" {...common} /></>}
       {name === 'file' && <><path d="M6 3h8l4 4v14H6z" {...common} /><path d="M14 3v5h4M9 12h6M9 16h6" {...common} /></>}
       {name === 'chart' && <><path d="M4 20V4M4 20h16" {...common} /><path d="m7 16 4-5 3 2 5-7" {...common} /></>}
+      {name === 'invoice' && <><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z" {...common} /><path d="M9 8h6M9 12h6M9 16h3" {...common} /></>}
+      {name === 'check' && <><circle cx="12" cy="12" r="9" {...common} /><path d="m8 12.5 2.5 2.5L16 9.5" {...common} /></>}
       {name === 'settings' && <><circle cx="12" cy="12" r="3" {...common} /><path d="M19 13.5v-3l-2-.7-.7-1.7.9-1.9-2.1-2.1-1.9.9-1.7-.7L10.5 2h-3l-.7 2.3-1.7.7-1.9-.9-2.1 2.1.9 1.9-.7 1.7-2 .7v3l2 .7.7 1.7-.9 1.9 2.1 2.1 1.9-.9 1.7.7.7 2.3h3l.7-2.3 1.7-.7 1.9.9 2.1-2.1-.9-1.9.7-1.7Z" transform="translate(2.5) scale(.8)" {...common} /></>}
     </svg>
   )
