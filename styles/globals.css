@@ -489,7 +489,9 @@ body {
 .profile-chip strong, .profile-chip small { display: block; }
 .profile-chip strong { font-size: .68rem; }
 .profile-chip small { margin-top: .1rem; color: var(--app-muted); font-size: .56rem; }
-.profile-chip i { width: .48rem; height: .48rem; border: 2px solid var(--app-white); border-radius: 50%; background: #50a575; box-shadow: 0 0 0 1px #50a575; }
+.profile-signout { display: grid; width: 1.7rem; height: 1.7rem; place-items: center; border-radius: 50%; color: var(--app-muted); transition: color .16s, background .16s; }
+.profile-signout svg { width: 1rem; height: 1rem; }
+.profile-signout:hover { background: #f3e2e6; color: var(--app-maroon); }
 
 .app-frame { min-height: 100vh; margin-left: 15.75rem; }
 .app-main { position: relative; min-height: 100vh; overflow: hidden; background: var(--app-grey); }
@@ -685,6 +687,7 @@ body {
   .app-frame { margin-left: 0; }
   .mobile-app-header { position: sticky; z-index: 30; top: 0; display: flex; height: 4rem; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--app-line); background: rgba(251,252,250,.94); padding: 0 1.1rem; backdrop-filter: blur(14px); }
   .mobile-app-header .app-brand { margin: 0; }.mobile-app-header .app-brand-mark { width: 1.8rem; height: 1.8rem; }
+  .mobile-header-actions { display: flex; align-items: center; gap: .5rem; }
   .mobile-settings { display: grid; width: 2rem; height: 2rem; place-items: center; border-radius: .6rem; background: #edf0ec; color: var(--app-forest); }.mobile-settings svg { width: 1.1rem; }
   .mobile-tabs { position: fixed; z-index: 50; right: 1rem; bottom: 1rem; left: 1rem; display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid rgba(221,226,220,.9); border-radius: 1rem; background: rgba(251,252,250,.94); padding: .35rem; box-shadow: 0 15px 40px rgba(31,55,45,.16); backdrop-filter: blur(16px); }
   .mobile-tabs a { display: flex; min-width: 0; flex-direction: column; align-items: center; gap: .18rem; border-radius: .7rem; padding: .42rem .25rem; color: #7d8a84; font-size: .47rem; font-weight: 750; }.mobile-tabs a.active { background: var(--app-forest); color: white; }.mobile-tabs svg { width: 1rem; height: 1rem; }

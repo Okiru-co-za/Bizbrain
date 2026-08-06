@@ -1,5 +1,6 @@
 import Layout from '../../components/Layout'
 import { useEffect, useState } from 'react'
+import { signOut } from 'next-auth/react'
 
 type Settings = {
   tenant: { name: string; domain?: string } | null
@@ -39,7 +40,13 @@ export default function SettingsPage() {
           <div className="bg-white p-4 rounded shadow-sm">
             <h3 className="font-medium mb-2">Account</h3>
             <div className="text-sm text-gray-600">{settings.user.name || settings.user.email}</div>
-            <div className="text-sm text-gray-600">{settings.user.email} • {settings.user.role}</div>
+            <div className="text-sm text-gray-600 mb-3">{settings.user.email} • {settings.user.role}</div>
+            <button
+              onClick={() => signOut({ callbackUrl: '/auth/signin' })}
+              className="text-sm px-3 py-1 border rounded text-red-600 hover:bg-red-50"
+            >
+              Sign out
+            </button>
           </div>
 
           <div className="bg-white p-4 rounded shadow-sm">

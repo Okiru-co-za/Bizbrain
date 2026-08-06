@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { signOut } from 'next-auth/react'
 
-type IconName = 'home' | 'spark' | 'people' | 'lead' | 'deal' | 'quote' | 'task' | 'inbox' | 'file' | 'chart' | 'invoice' | 'check' | 'hr' | 'leave' | 'clock' | 'sync' | 'settings'
+type IconName = 'home' | 'spark' | 'people' | 'lead' | 'deal' | 'quote' | 'task' | 'inbox' | 'file' | 'chart' | 'invoice' | 'check' | 'hr' | 'leave' | 'clock' | 'sync' | 'settings' | 'logout'
 
 const groups: Array<{ label: string; items: Array<{ href: string; label: string; icon: IconName }> }> = [
   {
@@ -64,6 +65,7 @@ function NavIcon({ name }: { name: IconName }) {
       {name === 'clock' && <><circle cx="12" cy="12" r="9" {...common} /><path d="M12 7v5l3.5 2" {...common} /></>}
       {name === 'sync' && <><path d="M4 12a8 8 0 0 1 13.66-5.66L20 8" {...common} /><path d="M20 4v4h-4" {...common} /><path d="M20 12a8 8 0 0 1-13.66 5.66L4 16" {...common} /><path d="M4 20v-4h4" {...common} /></>}
       {name === 'settings' && <><circle cx="12" cy="12" r="3" {...common} /><path d="M19 13.5v-3l-2-.7-.7-1.7.9-1.9-2.1-2.1-1.9.9-1.7-.7L10.5 2h-3l-.7 2.3-1.7.7-1.9-.9-2.1 2.1.9 1.9-.7 1.7-2 .7v3l2 .7.7 1.7-.9 1.9 2.1 2.1 1.9-.9 1.7.7.7 2.3h3l.7-2.3 1.7-.7 1.9.9 2.1-2.1-.9-1.9.7-1.7Z" transform="translate(2.5) scale(.8)" {...common} /></>}
+      {name === 'logout' && <><path d="M9 4H5v16h4" {...common} /><path d="M13 12h8m0 0-3-3m3 3-3 3" {...common} /></>}
     </svg>
   )
 }
@@ -109,14 +111,21 @@ export default function Nav() {
           <div className="profile-chip">
             <span>BT</span>
             <div><strong>BizBrain team</strong><small>Workspace owner</small></div>
-            <i aria-hidden="true" />
+            <button type="button" className="profile-signout" aria-label="Sign out" title="Sign out" onClick={() => signOut({ callbackUrl: '/auth/signin' })}>
+              <NavIcon name="logout" />
+            </button>
           </div>
         </div>
       </aside>
 
       <header className="mobile-app-header">
         <Link href="/dashboard" className="app-brand"><span className="app-brand-mark" aria-hidden="true"><i /><i /><i /></span><span>BizBrain</span></Link>
-        <Link href="/settings" className="mobile-settings" aria-label="Settings"><NavIcon name="settings" /></Link>
+        <div className="mobile-header-actions">
+          <Link href="/settings" className="mobile-settings" aria-label="Settings"><NavIcon name="settings" /></Link>
+          <button type="button" className="mobile-settings" aria-label="Sign out" title="Sign out" onClick={() => signOut({ callbackUrl: '/auth/signin' })}>
+            <NavIcon name="logout" />
+          </button>
+        </div>
       </header>
       <nav className="mobile-tabs" aria-label="Mobile navigation">
         {groups[0].items.map((item) => (
