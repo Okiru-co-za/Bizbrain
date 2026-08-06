@@ -139,6 +139,18 @@ async function main() {
     })
   }
 
+  console.log('Adding vendor billing emails (for the "scan inbox for subscriptions" feature)...')
+  const existingVendorEmail = await prisma.inboxItem.findFirst({ where: { tenantId, sender: 'billing@aws.amazon.com' } })
+  if (!existingVendorEmail) {
+    await prisma.inboxItem.createMany({
+      data: [
+        { tenantId, source: 'email', sender: 'billing@aws.amazon.com', subject: 'Your AWS invoice is ready', message: 'Your AWS invoice for this billing period is $32.00. This is a recurring monthly charge on your account.', category: 'Finance', priority: 'Low', status: 'OPEN' },
+        { tenantId, source: 'email', sender: 'billing@openai.com', subject: 'Your OpenAI API receipt', message: 'Thanks for using the OpenAI API. Your usage this month totaled $14.50, billed monthly.', category: 'Finance', priority: 'Low', status: 'OPEN' },
+        { tenantId, source: 'email', sender: 'billing@figma.com', subject: 'Your Figma subscription renews soon', message: 'Your Figma Professional plan will renew on 2026-09-01 for $9.00 per month.', category: 'Finance', priority: 'Low', status: 'OPEN' }
+      ]
+    })
+  }
+
   console.log('Adding documents...')
   const existingDocs = await prisma.document.count({ where: { tenantId } })
   if (existingDocs === 0) {

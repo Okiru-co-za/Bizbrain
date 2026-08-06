@@ -12,7 +12,8 @@ export default withAuth(
       pathname.startsWith('/auth') ||
       pathname === '/' ||
       pathname === '/robots.txt' ||
-      pathname === '/sitemap.xml'
+      pathname === '/sitemap.xml' ||
+      pathname === '/api/newsletter'
     ) {
       return NextResponse.next()
     }
@@ -29,7 +30,7 @@ export default withAuth(
     callbacks: {
       authorized: ({ token, req }) => {
         const pathname = req.nextUrl.pathname
-        const isPublic = pathname === '/' || pathname === '/robots.txt' || pathname === '/sitemap.xml'
+        const isPublic = pathname === '/' || pathname === '/robots.txt' || pathname === '/sitemap.xml' || pathname === '/api/newsletter'
         return isPublic || !!token
       }
     }

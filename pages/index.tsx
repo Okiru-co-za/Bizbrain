@@ -46,6 +46,32 @@ const faqs = [
 export default function MarketingHome() {
   const [activeTour, setActiveTour] = useState<keyof typeof tourData>('Bookings')
   const currentTour = tourData[activeTour]
+  const [newsletterEmail, setNewsletterEmail] = useState('')
+  const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
+  const [newsletterError, setNewsletterError] = useState('')
+
+  async function handleNewsletterSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setNewsletterStatus('submitting')
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: newsletterEmail })
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        setNewsletterError(data.error || 'Something went wrong. Please try again.')
+        setNewsletterStatus('error')
+        return
+      }
+      setNewsletterEmail('')
+      setNewsletterStatus('success')
+    } catch {
+      setNewsletterError('Something went wrong. Please try again.')
+      setNewsletterStatus('error')
+    }
+  }
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://bizbrain-production-5ef3.up.railway.app'
   const title = 'BizBrain | Your whole business, in your pocket'
   const description = 'BizBrain combines your website, CRM, invoicing, bookings, marketing, analytics and AI assistant in one custom business system for South African startups.'
@@ -230,7 +256,7 @@ export default function MarketingHome() {
         </main>
 
         <footer className="marketing-footer">
-          <div className="marketing-container footer-grid"><div><a href="#top" className="marketing-brand"><span className="marketing-brand-mark" aria-hidden="true"><i /><i /><i /></span><span>BizBrain</span></a><p>Your whole business, in your pocket. Built and supported by Okiru in South Africa.</p></div><div><strong>Explore</strong><a href="#product">Product</a><a href="#growth">Growth</a><a href="#pricing">Pricing</a><a href="#questions">Questions</a></div><div><strong>Okiru</strong><a href="https://www.okiru.biz/toolkit/" target="_blank" rel="noreferrer">AI Tool Advisor ↗</a><a href="https://www.okiru.biz/tools/" target="_blank" rel="noreferrer">All tools ↗</a><a href="https://www.okiru.biz/blog/" target="_blank" rel="noreferrer">Blog ↗</a></div><div><strong>Workspace</strong><Link href="/auth/signin">Sign in</Link><a href={WHATSAPP_URL} target="_blank" rel="noreferrer">WhatsApp us ↗</a></div></div>
+          <div className="marketing-container footer-grid"><div><a href="#top" className="marketing-brand"><span className="marketing-brand-mark" aria-hidden="true"><i /><i /><i /></span><span>BizBrain</span></a><p>Your whole business, in your pocket. Built and supported by Okiru in South Africa.</p><div className="footer-newsletter"><strong>Stay in the loop</strong><form onSubmit={handleNewsletterSubmit}><input type="email" required placeholder="you@yourbusiness.co.za" aria-label="Email address" value={newsletterEmail} onChange={(e) => setNewsletterEmail(e.target.value)} /><button type="submit" disabled={newsletterStatus === 'submitting'}>{newsletterStatus === 'submitting' ? 'Joining…' : 'Subscribe'}</button></form>{newsletterStatus === 'success' && <p className="newsletter-status success">You're subscribed. Welcome aboard!</p>}{newsletterStatus === 'error' && <p className="newsletter-status error">{newsletterError}</p>}</div></div><div><strong>Explore</strong><a href="#product">Product</a><a href="#growth">Growth</a><a href="#pricing">Pricing</a><a href="#questions">Questions</a></div><div><strong>Okiru</strong><a href="https://www.okiru.biz/toolkit/" target="_blank" rel="noreferrer">AI Tool Advisor ↗</a><a href="https://www.okiru.biz/tools/" target="_blank" rel="noreferrer">All tools ↗</a><a href="https://www.okiru.biz/blog/" target="_blank" rel="noreferrer">Blog ↗</a></div><div><strong>Workspace</strong><Link href="/auth/signin">Sign in</Link><a href={WHATSAPP_URL} target="_blank" rel="noreferrer">WhatsApp us ↗</a></div></div>
           <div className="marketing-container footer-bottom"><span>© {new Date().getFullYear()} Okiru BizBrain</span><span>Custom built for your company and brand. Cancel anytime on monthly plans.</span></div>
         </footer>
       </div>

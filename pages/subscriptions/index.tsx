@@ -6,10 +6,18 @@ type VendorSubscription = {
   name: string
   category?: string
   costCents: number
+  currency: string
   billingCycle: string
   status: string
   nextRenewalAt?: string
   notes?: string
+}
+
+const CURRENCY_SYMBOLS: Record<string, string> = { ZAR: 'R', USD: '$', EUR: '€', GBP: '£' }
+
+function formatAmount(cents: number, currency: string) {
+  const symbol = CURRENCY_SYMBOLS[currency] || `${currency} `
+  return `${symbol}${(cents / 100).toLocaleString('en-ZA')}`
 }
 
 const CYCLE_LABELS: Record<string, string> = {
@@ -59,6 +67,9 @@ export default function SubscriptionsPage() {
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
+  const [scanning, setScanning] = useState(false)
+  const [scanResult, setScanResult] = useState<{ scanned: number; created: string[]; updated: string[] } | null>(null)
+
   function load() {
     return fetch('/api/vendor-subscriptions')
       .then((r) => r.json())
@@ -69,13 +80,28 @@ export default function SubscriptionsPage() {
     load().finally(() => setLoading(false))
   }, [])
 
-  const monthlySpendCents = useMemo(
-    () =>
-      subscriptions
-        .filter((s) => s.status !== 'CANCELLED')
-        .reduce((sum, s) => sum + monthlyEquivalentCents(s), 0),
-    [subscriptions]
-  )
+  async function scanInbox() {
+    setScanning(true)
+    setScanResult(null)
+    try {
+      const res = await fetch('/api/vendor-subscriptions/scan-inbox', { method: 'POST' })
+      const data = await res.json()
+      setScanResult(data)
+      await load()
+    } finally {
+      setScanning(false)
+    }
+  }
+
+  const monthlySpendByCurrency = useMemo(() => {
+    const totals: Record<string, number> = {}
+    subscriptions
+      .filter((s) => s.status !== 'CANCELLED')
+      .forEach((s) => {
+        totals[s.currency] = (totals[s.currency] || 0) + monthlyEquivalentCents(s)
+      })
+    return totals
+  }, [subscriptions])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -129,8 +155,44 @@ export default function SubscriptionsPage() {
 
       <div className="bg-white p-4 rounded shadow-sm mb-6">
         <h3 className="font-medium mb-1">Estimated monthly spend</h3>
-        <div className="text-2xl font-semibold">R{(monthlySpendCents / 100).toLocaleString('en-ZA', { maximumFractionDigits: 0 })}</div>
-        <div className="text-sm text-gray-600">Across all active and trial subscriptions, normalized to a monthly amount.</div>
+        <div className="flex flex-col gap-1">
+          {Object.entries(monthlySpendByCurrency).length === 0 && <div className="text-2xl font-semibold">R0</div>}
+          {Object.entries(monthlySpendByCurrency).map(([currency, cents]) => (
+            <div key={currency} className="text-2xl font-semibold">
+              {formatAmount(Math.round(cents), currency)}
+              <span className="text-sm font-normal text-gray-500 ml-2">{currency}/month</span>
+            </div>
+          ))}
+        </div>
+        <div className="text-sm text-gray-600">
+          Across all active and trial subscriptions, normalized to a monthly amount.
+          {Object.keys(monthlySpendByCurrency).length > 1 && ' Shown per currency - not converted.'}
+        </div>
+      </div>
+
+      <div className="bg-white p-4 rounded shadow-sm mb-6">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h3 className="font-medium mb-1">Detect subscriptions from vendor emails</h3>
+            <p className="text-sm text-gray-600">Scans your Inbox for billing emails from known vendors (AWS, OpenAI, Figma, etc.) and adds or updates subscriptions automatically.</p>
+          </div>
+          <button onClick={scanInbox} disabled={scanning} className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50 whitespace-nowrap">
+            {scanning ? 'Scanning…' : 'Scan inbox'}
+          </button>
+        </div>
+        {scanResult && (
+          <div className="text-sm text-gray-700 mt-3">
+            Scanned {scanResult.scanned} inbox email{scanResult.scanned === 1 ? '' : 's'}.{' '}
+            {scanResult.created.length === 0 && scanResult.updated.length === 0
+              ? 'No vendor billing emails found.'
+              : (
+                <>
+                  {scanResult.created.length > 0 && `Added: ${scanResult.created.join(', ')}. `}
+                  {scanResult.updated.length > 0 && `Updated: ${scanResult.updated.join(', ')}.`}
+                </>
+              )}
+          </div>
+        )}
       </div>
 
       <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow-sm mb-6">
@@ -186,7 +248,7 @@ export default function SubscriptionsPage() {
                 {sub.category && <span className="text-sm text-gray-500"> • {sub.category}</span>}
               </div>
               <div className="text-sm text-gray-600">
-                R{(sub.costCents / 100).toLocaleString('en-ZA')} / {CYCLE_LABELS[sub.billingCycle] || sub.billingCycle}
+                {formatAmount(sub.costCents, sub.currency)} / {CYCLE_LABELS[sub.billingCycle] || sub.billingCycle}
                 {sub.nextRenewalAt && ` • renews ${new Date(sub.nextRenewalAt).toLocaleDateString('en-ZA')}`}
                 {sub.notes && ` • ${sub.notes}`}
               </div>
