@@ -9,6 +9,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "seed": "ts-node prisma/seed.ts",
+    "seed:extra": "ts-node prisma/seed-extra.ts",
     "tailwind:build": "tailwindcss -i ./styles/globals.css -o ./public/tailwind.css --minify",
     "format": "prettier --write ."
   },
